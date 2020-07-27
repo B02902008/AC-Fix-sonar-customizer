@@ -1,0 +1,41 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+}
+
+group 'selab.csie.ntu.edu.tw'
+version '1.0'
+
+sourceCompatibility = 1.11
+
+clientHost = System.hasProperty('CLIENT_HOST') ? System.getProperty('CLIENT_HOST') : clientHost
+clientPort = System.hasProperty('CLIENT_PORT') ? System.getProperty('CLIENT_PORT') : clientPort
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'com.google.guava:guava:29.0-jre'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task generateJavaConfig(type: Copy) {
+    from 'src/main/resources/template/Config.java'
+    into "${buildDir}/generated/java"
+    def prop = new Properties()
+    prop.setProperty('CLIENT_HOST_VAL', clientHost)
+    prop.setProperty('CLIENT_PORT_VAL', clientPort)
+    filter(ReplaceTokens, tokens: prop)
+}
+
+task buildDockerImage(type: Exec) {
+    workingDir rootProject.projectDir
+    commandLine 'docker', 'build', '-t', 'ac-fix/sonarqube-customized:1.0', '.'
+}
+
+sourceSets.main.java.srcDir "${buildDir}/generated/java"
+compileJava.dependsOn generateJavaConfig
+buildDockerImage.dependsOn jar
