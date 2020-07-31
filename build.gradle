@@ -9,9 +9,6 @@ version '1.0'
 
 sourceCompatibility = 1.11
 
-clientHost = System.hasProperty('CLIENT_HOST') ? System.getProperty('CLIENT_HOST') : clientHost
-clientPort = System.hasProperty('CLIENT_PORT') ? System.getProperty('CLIENT_PORT') : clientPort
-
 repositories {
     mavenCentral()
 }
@@ -25,15 +22,15 @@ dependencies {
 task generateJavaConfig(type: Copy) {
     from 'src/main/resources/template/Config.java'
     into "${buildDir}/generated/java"
-    def prop = new Properties()
-    prop.setProperty('CLIENT_HOST_VAL', clientHost)
-    prop.setProperty('CLIENT_PORT_VAL', clientPort)
-    filter(ReplaceTokens, tokens: prop)
+    filter(ReplaceTokens, tokens: [
+            CLIENT_HOST_VAL: project.hasProperty('AC_FIX_HOST') ? project.getProperties().get('AC_FIX_HOST') : 'localhost',
+            CLIENT_PORT_VAL: project.hasProperty('AC_FIX_CLIENT_PORT') ? project.getProperties().get('AC_FIX_CLIENT_PORT') : '4200'
+    ])
 }
 
 task buildDockerImage(type: Exec) {
     workingDir rootProject.projectDir
-    commandLine 'docker', 'build', '-t', 'ac-fix/sonarqube-customized:1.0', '.'
+    commandLine 'docker', 'build', '-t', 'ac-fix/sonarqube:1.0', '.'
 }
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java"
