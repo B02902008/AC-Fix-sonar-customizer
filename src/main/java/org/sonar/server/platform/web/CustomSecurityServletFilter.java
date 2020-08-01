@@ -27,9 +27,11 @@ public class CustomSecurityServletFilter implements Filter {
       httpResponse.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
       return;
     }
-    String origin = String.format("http://%s:%s", Config.CLIENT_HOST, Config.CLIENT_PORT);
-    httpResponse.addHeader("Content-Security-Policy", "frame-ancestors " + origin);
-    httpResponse.addHeader("X-Frame-Options", "ALLOW-FROM " + origin);
+    String origin = Config.CLIENT_ORIGIN;
+    if (!origin.startsWith("http://*:")) {
+      httpResponse.addHeader("Content-Security-Policy", "frame-ancestors " + origin);
+      httpResponse.addHeader("X-Frame-Options", "ALLOW-FROM " + origin);
+    }
     httpResponse.addHeader("X-XSS-Protection", "1; mode=block");
     httpResponse.addHeader("X-Content-Type-Options", "nosniff");
     chain.doFilter(httpRequest, httpResponse);

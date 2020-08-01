@@ -22,20 +22,13 @@ This project customizes SonarQube web server to serve AC-Fix.
 
 ## Build Project
 
-Build command: ```./gradlew build```
+Build command: ```./gradlew clean build```
 
-Default to allow client from ```localhost:4200``` to load SonarQube content to iFrame.
+## Options
 
-Add ```-PAC_FIX_HOST=[HOST]``` and ```-PAC_FIX_CLIENT_PORT=[PORT]``` to allow desired origin.
+Default to allow client from ```localhost:4200``` to load SonarQube content to iframe.
 
-## Build Docker Image
+Set the following properties to allow client from desired origin.
 
-Build command: ```./gradlew buildDockerImage```
-
-This will build a Docker image with tag ```ac-fix/ac-fix-sonarqube:1.0```
-
-Run the image with command like:
-
-```docker volume create ACFixSonarData```
-
-```docker run -d -p 9000:9000 -v ACFixSonarData:/opt/sonarqube/data [IMAGE ID]```
+- ```acfix.client.host```: Set this properties to ```*``` to allow all
+- ```acfix.client.port```

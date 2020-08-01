@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group 'selab.csie.ntu.edu.tw'
+group 'selab.csie.ntu'
 version '1.0'
 
 sourceCompatibility = 1.11
@@ -23,16 +23,12 @@ task generateJavaConfig(type: Copy) {
     from 'src/main/resources/template/Config.java'
     into "${buildDir}/generated/java"
     filter(ReplaceTokens, tokens: [
-            CLIENT_HOST_VAL: project.hasProperty('AC_FIX_HOST') ? project.getProperties().get('AC_FIX_HOST') : 'localhost',
-            CLIENT_PORT_VAL: project.hasProperty('AC_FIX_CLIENT_PORT') ? project.getProperties().get('AC_FIX_CLIENT_PORT') : '4200'
+            CLIENT_HOST_VAL: project.hasProperty('acfix.client.host') ?
+                    project.getProperties().get('acfix.client.host') : 'localhost',
+            CLIENT_PORT_VAL: project.hasProperty('acfix.client.port') ?
+                    project.getProperties().get('acfix.client.port') : '4200'
     ])
-}
-
-task buildDockerImage(type: Exec) {
-    workingDir rootProject.projectDir
-    commandLine 'docker', 'build', '-t', 'ac-fix/sonarqube:1.0', '.'
 }
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java"
 compileJava.dependsOn generateJavaConfig
-buildDockerImage.dependsOn jar
